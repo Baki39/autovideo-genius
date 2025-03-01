@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { BlurCard } from "@/components/ui/blur-card";
 import { RevealAnimation } from "@/components/ui/reveal-animation";
 import { Youtube, Layers, Sparkles, Zap } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const HeroSection = () => {
   return (
@@ -43,8 +44,8 @@ export const HeroSection = () => {
 
           <RevealAnimation delay={300}>
             <div className="flex flex-col sm:flex-row gap-4 mb-16">
-              <Button className="bg-youtube-red hover:bg-youtube-darkred text-white h-12 px-8 text-base">
-                Get Started Free
+              <Button className="bg-youtube-red hover:bg-youtube-darkred text-white h-12 px-8 text-base" asChild>
+                <Link to="/dashboard">Get Started Free</Link>
               </Button>
               <Button variant="outline" className="h-12 px-8 text-base">
                 See How It Works
