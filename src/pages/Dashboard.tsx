@@ -16,7 +16,9 @@ import {
   Clock,
   TrendingUp,
   Brain,
-  FileText
+  FileText,
+  VideoIcon,
+  UploadIcon
 } from "lucide-react";
 
 const Dashboard = () => {
@@ -181,7 +183,7 @@ const Dashboard = () => {
                     <BlurCard className="p-4 cursor-pointer hover:scale-[1.02] transition-all">
                       <div className="flex items-center space-x-4">
                         <div className="bg-purple-100 dark:bg-purple-900/40 p-3 rounded-lg">
-                          <Video className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                          <VideoIcon className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                         </div>
                         <div>
                           <h4 className="font-medium">
@@ -196,7 +198,7 @@ const Dashboard = () => {
                     <BlurCard className="p-4 cursor-pointer hover:scale-[1.02] transition-all">
                       <div className="flex items-center space-x-4">
                         <div className="bg-rose-100 dark:bg-rose-900/40 p-3 rounded-lg">
-                          <Upload className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+                          <UploadIcon className="w-5 h-5 text-rose-600 dark:text-rose-400" />
                         </div>
                         <div>
                           <h4 className="font-medium">
