@@ -1,8 +1,10 @@
+
 import React from "react";
 import { Header } from "@/components/header";
 import { BlurCard } from "@/components/ui/blur-card";
 import { RevealAnimation } from "@/components/ui/reveal-animation";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import { 
   Youtube, 
   Layers, 
@@ -22,6 +24,12 @@ import {
 } from "lucide-react";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+
+  const handleStartNewProject = () => {
+    navigate("/new-project");
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-gray-100 dark:from-youtube-darkblack dark:to-youtube-black">
       <Header />
@@ -211,7 +219,10 @@ const Dashboard = () => {
                     </BlurCard>
                   </div>
 
-                  <Button className="w-full bg-youtube-red hover:bg-youtube-darkred text-white">
+                  <Button 
+                    className="w-full bg-youtube-red hover:bg-youtube-darkred text-white"
+                    onClick={handleStartNewProject}
+                  >
                     <PlusCircle className="w-4 h-4 mr-2" />
                     Start New Project
                   </Button>
