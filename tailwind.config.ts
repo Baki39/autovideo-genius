@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -63,19 +62,14 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Custom colors
-				autotube: {
-					'50': '#f0f7ff',
-					'100': '#e0effe',
-					'200': '#bae0fd',
-					'300': '#7ec7fc',
-					'400': '#3aa9f8',
-					'500': '#1892eb',
-					'600': '#0a77d9',
-					'700': '#0d5eaf',
-					'800': '#125091',
-					'900': '#154577',
-					'950': '#0f2b4a',
+				youtube: {
+					red: '#ff0000',
+					darkred: '#cc0000',
+					black: '#282828',
+					darkblack: '#0f0f0f',
+					lightblack: '#333333',
+					gray: '#aaaaaa',
+					lightgray: '#f8f8f8',
 				}
 			},
 			borderRadius: {

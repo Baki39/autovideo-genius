@@ -17,7 +17,7 @@ export const BlurCard = ({
   return (
     <div
       className={cn(
-        "rounded-2xl bg-white/80 dark:bg-gray-950/50 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-glass overflow-hidden transition-all duration-300",
+        "rounded-2xl bg-white/80 dark:bg-youtube-black/50 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-glass overflow-hidden transition-all duration-300",
         hoverEffect && "hover:shadow-glass-strong hover:-translate-y-1",
         className
       )}
