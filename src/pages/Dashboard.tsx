@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Header } from "@/components/header";
 import { BlurCard } from "@/components/ui/blur-card";
@@ -20,7 +19,8 @@ import {
   Brain,
   FileText,
   VideoIcon,
-  UploadIcon
+  UploadIcon,
+  PenSquare
 } from "lucide-react";
 
 const Dashboard = () => {
@@ -28,6 +28,10 @@ const Dashboard = () => {
 
   const handleStartNewProject = () => {
     navigate("/new-project");
+  };
+
+  const handleGoToContentStudio = () => {
+    navigate("/content-studio");
   };
 
   return (
@@ -158,7 +162,10 @@ const Dashboard = () => {
                 </div>
                 <div className="space-y-5">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <BlurCard className="p-4 cursor-pointer hover:scale-[1.02] transition-all">
+                    <BlurCard 
+                      className="p-4 cursor-pointer hover:scale-[1.02] transition-all"
+                      onClick={handleGoToContentStudio}
+                    >
                       <div className="flex items-center space-x-4">
                         <div className="bg-blue-100 dark:bg-blue-900/40 p-3 rounded-lg">
                           <Brain className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -173,7 +180,10 @@ const Dashboard = () => {
                       </div>
                     </BlurCard>
 
-                    <BlurCard className="p-4 cursor-pointer hover:scale-[1.02] transition-all">
+                    <BlurCard 
+                      className="p-4 cursor-pointer hover:scale-[1.02] transition-all"
+                      onClick={handleGoToContentStudio}
+                    >
                       <div className="flex items-center space-x-4">
                         <div className="bg-indigo-100 dark:bg-indigo-900/40 p-3 rounded-lg">
                           <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
@@ -188,7 +198,10 @@ const Dashboard = () => {
                       </div>
                     </BlurCard>
 
-                    <BlurCard className="p-4 cursor-pointer hover:scale-[1.02] transition-all">
+                    <BlurCard 
+                      className="p-4 cursor-pointer hover:scale-[1.02] transition-all"
+                      onClick={handleGoToContentStudio}
+                    >
                       <div className="flex items-center space-x-4">
                         <div className="bg-purple-100 dark:bg-purple-900/40 p-3 rounded-lg">
                           <VideoIcon className="w-5 h-5 text-purple-600 dark:text-purple-400" />
@@ -203,7 +216,10 @@ const Dashboard = () => {
                       </div>
                     </BlurCard>
 
-                    <BlurCard className="p-4 cursor-pointer hover:scale-[1.02] transition-all">
+                    <BlurCard 
+                      className="p-4 cursor-pointer hover:scale-[1.02] transition-all"
+                      onClick={handleGoToContentStudio}
+                    >
                       <div className="flex items-center space-x-4">
                         <div className="bg-rose-100 dark:bg-rose-900/40 p-3 rounded-lg">
                           <UploadIcon className="w-5 h-5 text-rose-600 dark:text-rose-400" />
@@ -219,13 +235,24 @@ const Dashboard = () => {
                     </BlurCard>
                   </div>
 
-                  <Button 
-                    className="w-full bg-youtube-red hover:bg-youtube-darkred text-white"
-                    onClick={handleStartNewProject}
-                  >
-                    <PlusCircle className="w-4 h-4 mr-2" />
-                    Start New Project
-                  </Button>
+                  <div className="flex flex-wrap gap-3">
+                    <Button 
+                      className="flex-1 bg-youtube-red hover:bg-youtube-darkred text-white"
+                      onClick={handleStartNewProject}
+                    >
+                      <PlusCircle className="w-4 h-4 mr-2" />
+                      Start New Project
+                    </Button>
+                    
+                    <Button 
+                      variant="outline" 
+                      className="flex-1 gap-2"
+                      onClick={handleGoToContentStudio}
+                    >
+                      <PenSquare className="w-4 h-4" />
+                      Content Studio
+                    </Button>
+                  </div>
                 </div>
               </BlurCard>
             </RevealAnimation>
