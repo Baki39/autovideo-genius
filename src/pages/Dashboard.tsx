@@ -4,6 +4,8 @@ import { BlurCard } from "@/components/ui/blur-card";
 import { RevealAnimation } from "@/components/ui/reveal-animation";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { YouTubeConnect } from "@/components/youtube-connect";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Youtube, 
   Layers, 
@@ -79,8 +81,17 @@ const activityItems = [
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [activities, setActivities] = useState(activityItems);
   const [activeTab, setActiveTab] = useState("all");
+  const [isYouTubeConnectOpen, setIsYouTubeConnectOpen] = useState(false);
+  const [youtubeConnected, setYoutubeConnected] = useState(false);
+  const [channelStats, setChannelStats] = useState({
+    subscribers: 0,
+    views: 0,
+    videos: 0,
+    channelName: ""
+  });
 
   const handleStartNewProject = () => {
     navigate("/new-project");
@@ -99,6 +110,58 @@ const Dashboard = () => {
   const handleMarkAllAsRead = () => {
     setActivities(activities.map(item => ({ ...item, read: true })));
   };
+
+  const handleYouTubeConnect = (channelId: string, apiKey: string) => {
+    localStorage.setItem("youtube_channel_id", channelId);
+    localStorage.setItem("youtube_api_key", apiKey);
+    
+    setYoutubeConnected(true);
+    setIsYouTubeConnectOpen(false);
+    
+    const newActivity = {
+      id: Date.now(),
+      type: 'progress',
+      title: 'YouTube Channel Connected',
+      description: `Successfully connected to YouTube channel`,
+      icon: <CheckCircle2 className="w-4 h-4 text-green-500" />,
+      timestamp: new Date(),
+      read: false
+    };
+    
+    setActivities([newActivity, ...activities]);
+    
+    fetchChannelStats(channelId, apiKey);
+  };
+  
+  const fetchChannelStats = async (channelId: string, apiKey: string) => {
+    try {
+      const url = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${channelId}&key=${apiKey}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      if (data.items && data.items.length > 0) {
+        const channel = data.items[0];
+        setChannelStats({
+          subscribers: parseInt(channel.statistics.subscriberCount) || 0,
+          views: parseInt(channel.statistics.viewCount) || 0,
+          videos: parseInt(channel.statistics.videoCount) || 0,
+          channelName: channel.snippet.title || ""
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching channel stats:", error);
+    }
+  };
+  
+  useEffect(() => {
+    const channelId = localStorage.getItem("youtube_channel_id");
+    const apiKey = localStorage.getItem("youtube_api_key");
+    
+    if (channelId && apiKey) {
+      setYoutubeConnected(true);
+      fetchChannelStats(channelId, apiKey);
+    }
+  }, []);
 
   const filteredActivities = () => {
     if (activeTab === "all") return activities;
@@ -169,18 +232,52 @@ const Dashboard = () => {
                     <BarChart3 className="w-5 h-5 text-youtube-red" />
                   </div>
                   <div className="space-y-4 flex-grow">
-                    <div>
-                      <p className="text-sm text-foreground/60">Subscribers</p>
-                      <p className="text-2xl font-bold">0</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-foreground/60">Total Views</p>
-                      <p className="text-2xl font-bold">0</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-foreground/60">Videos</p>
-                      <p className="text-2xl font-bold">0</p>
-                    </div>
+                    {youtubeConnected ? (
+                      <>
+                        {channelStats.channelName && (
+                          <div className="mb-4">
+                            <p className="text-sm text-foreground/60">Channel</p>
+                            <p className="text-md font-semibold">{channelStats.channelName}</p>
+                          </div>
+                        )}
+                        <div>
+                          <p className="text-sm text-foreground/60">Subscribers</p>
+                          <p className="text-2xl font-bold">{channelStats.subscribers.toLocaleString()}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-foreground/60">Total Views</p>
+                          <p className="text-2xl font-bold">{channelStats.views.toLocaleString()}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-foreground/60">Videos</p>
+                          <p className="text-2xl font-bold">{channelStats.videos.toLocaleString()}</p>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div>
+                          <p className="text-sm text-foreground/60">Subscribers</p>
+                          <p className="text-2xl font-bold">0</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-foreground/60">Total Views</p>
+                          <p className="text-2xl font-bold">0</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-foreground/60">Videos</p>
+                          <p className="text-2xl font-bold">0</p>
+                        </div>
+                        <div className="mt-4">
+                          <Button 
+                            className="w-full bg-youtube-red hover:bg-youtube-darkred text-white"
+                            onClick={() => setIsYouTubeConnectOpen(true)}
+                          >
+                            <Youtube className="w-4 h-4 mr-2" />
+                            Connect Channel
+                          </Button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </BlurCard>
@@ -436,9 +533,13 @@ const Dashboard = () => {
                   </div>
                   
                   <div className="pt-2">
-                    <Button variant="outline" className="w-full">
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => setIsYouTubeConnectOpen(true)}
+                    >
                       <Youtube className="w-4 h-4 mr-2 text-youtube-red" />
-                      Connect YouTube Channel
+                      {youtubeConnected ? "Manage YouTube Channel" : "Connect YouTube Channel"}
                     </Button>
                   </div>
                 </div>
@@ -447,6 +548,12 @@ const Dashboard = () => {
           </div>
         </div>
       </main>
+      
+      <YouTubeConnect 
+        isOpen={isYouTubeConnectOpen}
+        onClose={() => setIsYouTubeConnectOpen(false)}
+        onConnect={handleYouTubeConnect}
+      />
     </div>
   );
 };
