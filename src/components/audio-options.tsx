@@ -13,7 +13,11 @@ interface AudioOptionsProps {
     backgroundMusic: string;
     musicVolume: number;
   };
-  onProjectDataChange: (data: Partial<typeof projectData>) => void;
+  onProjectDataChange: (data: Partial<{
+    voiceId: string;
+    backgroundMusic: string;
+    musicVolume: number;
+  }>) => void;
   onSave: () => void;
 }
 

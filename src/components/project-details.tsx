@@ -16,7 +16,12 @@ interface ProjectDetailsProps {
     duration: number;
     style: string;
   };
-  onProjectDataChange: (data: Partial<typeof projectData>) => void;
+  onProjectDataChange: (data: Partial<{ 
+    title: string;
+    concept: string;
+    duration: number;
+    style: string;
+  }>) => void;
   onGenerate: () => void;
   isGenerating: boolean;
 }
