@@ -32,7 +32,10 @@ export const YouTubeConnect: React.FC<YouTubeConnectProps> = ({
   const [connectionStatus, setConnectionStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorDetails, setErrorDetails] = useState<{
     message: string;
+    code?: number;
     isApiDisabled?: boolean;
+    isKeyInvalid?: boolean;
+    isChannelNotFound?: boolean;
     activationUrl?: string;
   } | null>(null);
   const [channelDetails, setChannelDetails] = useState<{
@@ -63,36 +66,51 @@ export const YouTubeConnect: React.FC<YouTubeConnectProps> = ({
       const response = await fetch(url);
       const data = await response.json();
       
-      if (response.status === 403 && data.error) {
-        // Check for specific API disabled error
-        const isApiDisabled = data.error.message?.includes("API v3 has not been used in project") || 
-                             data.error.message?.includes("disabled");
+      // Handle specific error cases
+      if (!response.ok) {
+        let errorInfo = {
+          message: data.error?.message || "Failed to connect to YouTube API",
+          code: data.error?.code
+        };
         
-        let activationUrl = "";
-        // Try to extract the activation URL if available
-        if (isApiDisabled && data.error.message) {
-          const urlMatch = data.error.message.match(/https:\/\/console\.developers\.google\.com\/apis\/api\/youtube\.googleapis\.com\/overview\?project=[0-9]+/);
-          if (urlMatch) {
-            activationUrl = urlMatch[0];
-          }
+        // Check specific error codes
+        switch (data.error?.code) {
+          case 400:
+            errorInfo.isKeyInvalid = true;
+            errorInfo.message = "The API key is invalid. Please check your API key and try again.";
+            break;
+          case 403:
+            if (data.error.message?.includes("API has not been used") || 
+                data.error.message?.includes("API v3 has not been used") || 
+                data.error.message?.includes("disabled")) {
+              
+              errorInfo.isApiDisabled = true;
+              
+              // Extract activation URL if present
+              const urlMatch = data.error.message.match(/https:\/\/console\.developers\.google\.com\/apis\/api\/youtube\.googleapis\.com\/overview\?project=[0-9]+/);
+              if (urlMatch) {
+                errorInfo.activationUrl = urlMatch[0];
+              } else {
+                errorInfo.activationUrl = "https://console.cloud.google.com/apis/library/youtube.googleapis.com";
+              }
+            } else {
+              errorInfo.isKeyInvalid = true;
+              errorInfo.message = "Access denied. Your API key might be incorrect or restricted.";
+            }
+            break;
+          case 404:
+            errorInfo.isChannelNotFound = true;
+            errorInfo.message = "Channel not found. Please check your Channel ID.";
+            break;
         }
-
-        throw {
-          message: data.error.message || "Failed to connect to YouTube API",
-          isApiDisabled,
-          activationUrl
-        };
-      }
-      
-      if (data.error) {
-        throw {
-          message: data.error.message || "Failed to connect to YouTube API"
-        };
+        
+        throw errorInfo;
       }
       
       if (!data.items || data.items.length === 0) {
         throw {
-          message: "Channel not found. Please check your Channel ID."
+          message: "Channel not found. Please check your Channel ID.",
+          isChannelNotFound: true
         };
       }
       
@@ -119,7 +137,10 @@ export const YouTubeConnect: React.FC<YouTubeConnectProps> = ({
       // Handle the error details
       setErrorDetails({
         message: error.message || "Failed to connect to YouTube API",
+        code: error.code,
         isApiDisabled: error.isApiDisabled,
+        isKeyInvalid: error.isKeyInvalid,
+        isChannelNotFound: error.isChannelNotFound,
         activationUrl: error.activationUrl
       });
       
@@ -141,6 +162,73 @@ export const YouTubeConnect: React.FC<YouTubeConnectProps> = ({
         description: "Your YouTube channel has been successfully connected",
       });
     }
+  };
+
+  const renderErrorMessage = () => {
+    if (!errorDetails) return null;
+
+    if (errorDetails.isApiDisabled) {
+      return (
+        <div className="flex flex-col gap-2 text-red-800 dark:text-red-300">
+          <div className="flex items-center gap-2">
+            <XCircle className="h-5 w-5 flex-shrink-0" />
+            <p>YouTube Data API is not enabled for your API key</p>
+          </div>
+          
+          <div className="mt-2 pl-7">
+            <p className="mb-2 text-sm">You need to enable the YouTube Data API v3 for your project:</p>
+            <ol className="ml-5 list-decimal text-sm space-y-1">
+              <li>Go to the Google Cloud Console</li>
+              <li>Enable the YouTube Data API v3 for your project</li>
+              <li>Wait a few minutes for changes to take effect</li>
+              <li>Try connecting again</li>
+            </ol>
+            {errorDetails.activationUrl && (
+              <a 
+                href={errorDetails.activationUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex items-center text-sm font-medium text-youtube-red hover:underline"
+              >
+                Open Google Cloud Console
+                <ExternalLink className="ml-1 h-3 w-3" />
+              </a>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    if (errorDetails.isKeyInvalid) {
+      return (
+        <div className="flex items-center gap-2 text-red-800 dark:text-red-300">
+          <XCircle className="h-5 w-5 flex-shrink-0" />
+          <div>
+            <p>Invalid API Key</p>
+            <p className="text-sm mt-1">Please check that your API key is correct and has the proper permissions.</p>
+          </div>
+        </div>
+      );
+    }
+
+    if (errorDetails.isChannelNotFound) {
+      return (
+        <div className="flex items-center gap-2 text-red-800 dark:text-red-300">
+          <XCircle className="h-5 w-5 flex-shrink-0" />
+          <div>
+            <p>Channel not found</p>
+            <p className="text-sm mt-1">The Channel ID you provided could not be found. Please verify your Channel ID is correct.</p>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex items-center gap-2 text-red-800 dark:text-red-300">
+        <XCircle className="h-5 w-5 flex-shrink-0" />
+        <p>{errorDetails.message}</p>
+      </div>
+    );
   };
 
   return (
@@ -209,35 +297,7 @@ export const YouTubeConnect: React.FC<YouTubeConnectProps> = ({
 
           {connectionStatus === "error" && (
             <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-900/30 dark:bg-red-900/20">
-              <div className="flex flex-col gap-2 text-red-800 dark:text-red-300">
-                <div className="flex items-center gap-2">
-                  <XCircle className="h-5 w-5 flex-shrink-0" />
-                  <p>{errorDetails?.isApiDisabled 
-                      ? "YouTube Data API is not enabled for your API key" 
-                      : "Connection failed. Please check your Channel ID and API Key and try again."}</p>
-                </div>
-                
-                {errorDetails?.isApiDisabled && errorDetails.activationUrl && (
-                  <div className="mt-2 pl-7">
-                    <p className="mb-2 text-sm">You need to enable the YouTube Data API v3 for your project:</p>
-                    <ol className="ml-5 list-decimal text-sm space-y-1">
-                      <li>Go to the Google Cloud Console</li>
-                      <li>Enable the YouTube Data API v3 for your project</li>
-                      <li>Wait a few minutes for changes to take effect</li>
-                      <li>Try connecting again</li>
-                    </ol>
-                    <a 
-                      href={errorDetails.activationUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-3 inline-flex items-center text-sm font-medium text-youtube-red hover:underline"
-                    >
-                      Open Google Cloud Console
-                      <ExternalLink className="ml-1 h-3 w-3" />
-                    </a>
-                  </div>
-                )}
-              </div>
+              {renderErrorMessage()}
             </div>
           )}
         </div>
