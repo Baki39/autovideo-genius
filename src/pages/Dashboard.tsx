@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Header } from "@/components/header";
 import { BlurCard } from "@/components/ui/blur-card";
 import { RevealAnimation } from "@/components/ui/reveal-animation";
@@ -20,11 +20,67 @@ import {
   FileText,
   VideoIcon,
   UploadIcon,
-  PenSquare
+  PenSquare,
+  Bell,
+  MessageSquare,
+  ThumbsUp,
+  Eye,
+  CheckCircle2
 } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+
+const activityItems = [
+  {
+    id: 1,
+    type: 'welcome',
+    title: 'Welcome to AutoTube!',
+    description: 'Get started by connecting your YouTube channel',
+    icon: <Youtube className="w-4 h-4 text-youtube-red" />,
+    timestamp: new Date(),
+    read: false
+  },
+  {
+    id: 2,
+    type: 'tip',
+    title: 'Pro Tip: Research Trends',
+    description: 'Use the Content Studio to research trending topics in your niche',
+    icon: <Sparkles className="w-4 h-4 text-blue-500" />,
+    timestamp: new Date(Date.now() - 1000 * 60 * 60), // 1 hour ago
+    read: false
+  },
+  {
+    id: 3,
+    type: 'notification',
+    title: 'New Features Available',
+    description: 'Check out our new AI-powered script generator in Content Studio',
+    icon: <Bell className="w-4 h-4 text-purple-500" />,
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3), // 3 hours ago
+    read: true
+  },
+  {
+    id: 4,
+    type: 'progress',
+    title: 'Project "Getting Started" Created',
+    description: 'Your new project is ready for content creation',
+    icon: <CheckCircle2 className="w-4 h-4 text-green-500" />,
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
+    read: true
+  },
+  {
+    id: 5,
+    type: 'engagement',
+    title: 'Engagement Alert',
+    description: 'Your latest video received 10 new comments',
+    icon: <MessageSquare className="w-4 h-4 text-amber-500" />,
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48), // 2 days ago
+    read: true
+  }
+];
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [activities, setActivities] = useState(activityItems);
+  const [activeTab, setActiveTab] = useState("all");
 
   const handleStartNewProject = () => {
     navigate("/new-project");
@@ -32,6 +88,55 @@ const Dashboard = () => {
 
   const handleGoToContentStudio = () => {
     navigate("/content-studio");
+  };
+
+  const handleMarkAsRead = (id: number) => {
+    setActivities(activities.map(item => 
+      item.id === id ? { ...item, read: true } : item
+    ));
+  };
+
+  const handleMarkAllAsRead = () => {
+    setActivities(activities.map(item => ({ ...item, read: true })));
+  };
+
+  const filteredActivities = () => {
+    if (activeTab === "all") return activities;
+    if (activeTab === "unread") return activities.filter(item => !item.read);
+    if (activeTab === "notifications") return activities.filter(item => item.type === 'notification' || item.type === 'engagement');
+    if (activeTab === "system") return activities.filter(item => item.type === 'welcome' || item.type === 'tip' || item.type === 'progress');
+    return activities;
+  };
+
+  const getActivityIcon = (activity: typeof activities[0]) => {
+    return (
+      <div className={`p-2 rounded-full ${getIconBgColor(activity.type)}`}>
+        {activity.icon}
+      </div>
+    );
+  };
+
+  const getIconBgColor = (type: string) => {
+    switch (type) {
+      case 'welcome': return 'bg-youtube-red/10';
+      case 'tip': return 'bg-blue-100 dark:bg-blue-900/40';
+      case 'notification': return 'bg-purple-100 dark:bg-purple-900/40';
+      case 'progress': return 'bg-green-100 dark:bg-green-900/40';
+      case 'engagement': return 'bg-amber-100 dark:bg-amber-900/40';
+      default: return 'bg-gray-100 dark:bg-gray-800';
+    }
+  };
+
+  const formatTimestamp = (timestamp: Date) => {
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - timestamp.getTime()) / 1000);
+    
+    if (diffInSeconds < 60) return `${diffInSeconds} seconds ago`;
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
+    
+    return timestamp.toLocaleDateString();
   };
 
   return (
@@ -266,21 +371,76 @@ const Dashboard = () => {
                   </h3>
                   <Layers className="w-5 h-5 text-youtube-red" />
                 </div>
+                
                 <div className="space-y-4">
-                  <div className="flex items-start space-x-3 p-3 bg-gray-50 dark:bg-youtube-black/30 rounded-lg">
-                    <div className="bg-youtube-red/10 p-2 rounded-full">
-                      <Youtube className="w-4 h-4 text-youtube-red" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">Welcome to AutoTube!</p>
-                      <p className="text-xs text-foreground/70">Get started by connecting your YouTube channel</p>
-                      <p className="text-xs text-foreground/50 mt-1">Just now</p>
-                    </div>
+                  <div className="flex items-center justify-between">
+                    <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
+                      <TabsList className="grid w-full grid-cols-4">
+                        <TabsTrigger value="all">All</TabsTrigger>
+                        <TabsTrigger value="unread">Unread</TabsTrigger>
+                        <TabsTrigger value="notifications">Alerts</TabsTrigger>
+                        <TabsTrigger value="system">System</TabsTrigger>
+                      </TabsList>
+                    </Tabs>
                   </div>
                   
-                  <Button variant="outline" className="w-full">
-                    Connect YouTube Channel
-                  </Button>
+                  <div className="flex justify-end">
+                    <Button 
+                      variant="ghost" 
+                      className="text-xs px-2 py-1 h-auto"
+                      onClick={handleMarkAllAsRead}
+                    >
+                      Mark all as read
+                    </Button>
+                  </div>
+                  
+                  <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+                    {filteredActivities().length > 0 ? (
+                      filteredActivities().map((activity) => (
+                        <div 
+                          key={activity.id}
+                          className={`flex items-start space-x-3 p-3 rounded-lg transition-all ${
+                            activity.read ? 'bg-gray-50 dark:bg-youtube-black/30' : 'bg-gray-100 dark:bg-youtube-black/60 border-l-2 border-youtube-red'
+                          }`}
+                        >
+                          {getActivityIcon(activity)}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm font-medium truncate">{activity.title}</p>
+                              <span className="text-xs text-foreground/50 whitespace-nowrap ml-2">
+                                {formatTimestamp(activity.timestamp)}
+                              </span>
+                            </div>
+                            <p className="text-xs text-foreground/70 mt-1">
+                              {activity.description}
+                            </p>
+                          </div>
+                          {!activity.read && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={() => handleMarkAsRead(activity.id)}
+                            >
+                              <Eye className="h-3 w-3" />
+                              <span className="sr-only">Mark as read</span>
+                            </Button>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-6 text-foreground/50">
+                        <p>No activities for this filter</p>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="pt-2">
+                    <Button variant="outline" className="w-full">
+                      <Youtube className="w-4 h-4 mr-2 text-youtube-red" />
+                      Connect YouTube Channel
+                    </Button>
+                  </div>
                 </div>
               </BlurCard>
             </RevealAnimation>
