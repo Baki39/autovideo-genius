@@ -14,6 +14,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Youtube, RefreshCw, CheckCircle2, XCircle, ExternalLink } from "lucide-react";
 
+// Define a proper error interface to fix type errors
+interface YouTubeApiError {
+  message: string;
+  code?: number;
+  isApiDisabled?: boolean;
+  isKeyInvalid?: boolean;
+  isChannelNotFound?: boolean;
+  activationUrl?: string;
+}
+
 interface YouTubeConnectProps {
   isOpen: boolean;
   onClose: () => void;
@@ -30,14 +40,7 @@ export const YouTubeConnect: React.FC<YouTubeConnectProps> = ({
   const [apiKey, setApiKey] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [errorDetails, setErrorDetails] = useState<{
-    message: string;
-    code?: number;
-    isApiDisabled?: boolean;
-    isKeyInvalid?: boolean;
-    isChannelNotFound?: boolean;
-    activationUrl?: string;
-  } | null>(null);
+  const [errorDetails, setErrorDetails] = useState<YouTubeApiError | null>(null);
   const [channelDetails, setChannelDetails] = useState<{
     title: string;
     thumbnailUrl: string;
@@ -68,7 +71,7 @@ export const YouTubeConnect: React.FC<YouTubeConnectProps> = ({
       
       // Handle specific error cases
       if (!response.ok) {
-        let errorInfo = {
+        let errorInfo: YouTubeApiError = {
           message: data.error?.message || "Failed to connect to YouTube API",
           code: data.error?.code
         };
@@ -111,7 +114,7 @@ export const YouTubeConnect: React.FC<YouTubeConnectProps> = ({
         throw {
           message: "Channel not found. Please check your Channel ID.",
           isChannelNotFound: true
-        };
+        } as YouTubeApiError;
       }
       
       const channel = data.items[0];
@@ -134,7 +137,7 @@ export const YouTubeConnect: React.FC<YouTubeConnectProps> = ({
       console.error("YouTube API connection error:", error);
       setConnectionStatus("error");
       
-      // Handle the error details
+      // Handle the error details - ensure it matches our YouTubeApiError type
       setErrorDetails({
         message: error.message || "Failed to connect to YouTube API",
         code: error.code,
