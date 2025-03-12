@@ -18,32 +18,8 @@ import { ProjectDetails } from "@/components/project-details";
 import { VideoPreview } from "@/components/video-preview";
 import { AudioOptions } from "@/components/audio-options";
 import { useToast } from "@/hooks/use-toast";
-
-// RunwareService for AI video generation
-class RunwareService {
-  private apiKey: string;
-  
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
-  }
-  
-  async generateVideo(prompt: string): Promise<string> {
-    try {
-      // For now, this is a placeholder. In a real implementation, 
-      // this would call the Runware API
-      console.log("Generating video with Runware AI using prompt:", prompt);
-      
-      // Simulating API call delay
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
-      // In a real implementation, this would return the video URL from Runware
-      return "/placeholder.svg";
-    } catch (error) {
-      console.error("Error generating video with Runware AI:", error);
-      throw error;
-    }
-  }
-}
+import { RunwareService } from "@/services/runware-service";
+import { RunwareWebSocketService } from "@/services/runware-websocket-service";
 
 const NewProject = () => {
   const navigate = useNavigate();
@@ -59,7 +35,7 @@ const NewProject = () => {
     backgroundMusic: "upbeat",
     musicVolume: 30,
     script: "",
-    runwayApiKey: "",  // Added for Runware API key
+    runwayApiKey: "",
   });
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
@@ -93,16 +69,37 @@ const NewProject = () => {
     setIsGenerating(true);
     
     try {
-      // Initialize the Runware service with the API key
-      const runwareService = new RunwareService(projectData.runwayApiKey);
+      // First try using the WebSocket service
+      const prompt = `Create a ${projectData.duration}-second ${projectData.style} video about: ${projectData.concept}`;
       
-      // Generate the video using the script as the prompt
-      const generatedVideoUrl = await runwareService.generateVideo(
-        `Create a ${projectData.duration}-second ${projectData.style} video about: ${projectData.concept}. 
-         Script: ${projectData.script.substring(0, 500)}...`
-      );
+      try {
+        // Try WebSocket API first
+        const wsService = new RunwareWebSocketService(projectData.runwayApiKey);
+        const result = await wsService.generateVideo({
+          prompt,
+          duration: projectData.duration,
+          style: projectData.style,
+          script: projectData.script
+        });
+        
+        setVideoUrl(result.videoURL);
+      } catch (wsError) {
+        console.error("WebSocket API failed, trying REST API:", wsError);
+        
+        // Fallback to REST API
+        const restService = new RunwareService(projectData.runwayApiKey);
+        const videoUrl = await restService.generateVideo({
+          apiKey: projectData.runwayApiKey,
+          prompt,
+          duration: projectData.duration,
+          style: projectData.style,
+          script: projectData.script
+        });
+        
+        setVideoUrl(videoUrl);
+      }
       
-      setVideoUrl(generatedVideoUrl);
+      // If we get here, one of the APIs worked
       setStep("preview");
       
       toast({
@@ -116,6 +113,9 @@ const NewProject = () => {
         description: "Failed to generate video. Please check your API key and try again.",
         variant: "destructive"
       });
+      
+      // For testing purposes, use a placeholder video URL
+      setVideoUrl("/placeholder.svg");
     } finally {
       setIsGenerating(false);
     }
