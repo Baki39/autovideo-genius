@@ -17,9 +17,37 @@ import { useNavigate } from "react-router-dom";
 import { ProjectDetails } from "@/components/project-details";
 import { VideoPreview } from "@/components/video-preview";
 import { AudioOptions } from "@/components/audio-options";
+import { useToast } from "@/hooks/use-toast";
+
+// RunwareService for AI video generation
+class RunwareService {
+  private apiKey: string;
+  
+  constructor(apiKey: string) {
+    this.apiKey = apiKey;
+  }
+  
+  async generateVideo(prompt: string): Promise<string> {
+    try {
+      // For now, this is a placeholder. In a real implementation, 
+      // this would call the Runware API
+      console.log("Generating video with Runware AI using prompt:", prompt);
+      
+      // Simulating API call delay
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      // In a real implementation, this would return the video URL from Runware
+      return "/placeholder.svg";
+    } catch (error) {
+      console.error("Error generating video with Runware AI:", error);
+      throw error;
+    }
+  }
+}
 
 const NewProject = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [step, setStep] = useState<"details" | "preview" | "audio">("details");
   const [isGenerating, setIsGenerating] = useState(false);
   const [projectData, setProjectData] = useState({
@@ -31,6 +59,7 @@ const NewProject = () => {
     backgroundMusic: "upbeat",
     musicVolume: 30,
     script: "",
+    runwayApiKey: "",  // Added for Runware API key
   });
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
@@ -43,18 +72,61 @@ const NewProject = () => {
   };
 
   const handleGenerateVideo = async () => {
+    if (!projectData.runwayApiKey) {
+      toast({
+        title: "API Key Required",
+        description: "Please enter your Runware AI API key in the Project Details tab.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!projectData.script) {
+      toast({
+        title: "Script Required",
+        description: "Please generate or enter a script before generating a video.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsGenerating(true);
-    // Simulate AI video generation
-    setTimeout(() => {
-      setIsGenerating(false);
-      setVideoUrl("/placeholder.svg"); // In a real app, this would be the actual video URL
+    
+    try {
+      // Initialize the Runware service with the API key
+      const runwareService = new RunwareService(projectData.runwayApiKey);
+      
+      // Generate the video using the script as the prompt
+      const generatedVideoUrl = await runwareService.generateVideo(
+        `Create a ${projectData.duration}-second ${projectData.style} video about: ${projectData.concept}. 
+         Script: ${projectData.script.substring(0, 500)}...`
+      );
+      
+      setVideoUrl(generatedVideoUrl);
       setStep("preview");
-    }, 3000);
+      
+      toast({
+        title: "Video Generated",
+        description: "Your AI video has been successfully generated.",
+      });
+    } catch (error) {
+      console.error("Video generation error:", error);
+      toast({
+        title: "Generation Failed",
+        description: "Failed to generate video. Please check your API key and try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleSaveProject = () => {
     // Here you would save the project to your backend
-    alert("Project saved successfully!");
+    toast({
+      title: "Project Saved",
+      description: "Your project has been saved successfully!",
+    });
     navigate("/dashboard");
   };
 

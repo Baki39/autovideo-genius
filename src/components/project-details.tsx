@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Wand2, Clock, FileText, RefreshCw } from "lucide-react";
+import { Wand2, Clock, FileText, RefreshCw, Key } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -18,6 +18,7 @@ interface ProjectDetailsProps {
     duration: number;
     style: string;
     script?: string;
+    runwayApiKey?: string;
   };
   onProjectDataChange: (data: Partial<{ 
     title: string;
@@ -25,6 +26,7 @@ interface ProjectDetailsProps {
     duration: number;
     style: string;
     script?: string;
+    runwayApiKey?: string;
   }>) => void;
   onGenerate: () => void;
   isGenerating: boolean;
@@ -116,6 +118,23 @@ export const ProjectDetails: React.FC<ProjectDetailsProps> = ({
             value={projectData.title}
             onChange={(e) => onProjectDataChange({ title: e.target.value })}
           />
+        </div>
+
+        <div>
+          <Label htmlFor="runwayApiKey" className="mb-2 block flex items-center">
+            <Key className="w-4 h-4 mr-2 text-youtube-red" />
+            Runware AI API Key
+          </Label>
+          <Input
+            id="runwayApiKey"
+            type="password"
+            placeholder="Enter your Runware AI API key"
+            value={projectData.runwayApiKey || ""}
+            onChange={(e) => onProjectDataChange({ runwayApiKey: e.target.value })}
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Get your API key from <a href="https://runware.ai" target="_blank" rel="noopener noreferrer" className="text-youtube-red hover:underline">Runware AI</a>
+          </p>
         </div>
 
         <Tabs value={scriptTab} onValueChange={(value) => setScriptTab(value as "concept" | "script")}>
@@ -228,13 +247,13 @@ export const ProjectDetails: React.FC<ProjectDetailsProps> = ({
 
         <Button 
           onClick={onGenerate} 
-          disabled={isGenerating || !projectData.concept || !projectData.title}
+          disabled={isGenerating || !projectData.concept || !projectData.title || !projectData.runwayApiKey || !projectData.script}
           className="w-full bg-youtube-red hover:bg-youtube-darkred text-white"
         >
           {isGenerating ? (
             <>
               <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-              Generating Video...
+              Generating Video with Runware AI...
             </>
           ) : (
             <>
