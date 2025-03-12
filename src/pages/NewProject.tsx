@@ -4,11 +4,7 @@ import { Header } from "@/components/header";
 import { BlurCard } from "@/components/ui/blur-card";
 import { RevealAnimation } from "@/components/ui/reveal-animation";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
 import { 
   ArrowLeft, 
   Wand2, 
@@ -16,11 +12,6 @@ import {
   VideoIcon, 
   Mic, 
   FileText,
-  Play,
-  Pause,
-  RotateCcw,
-  Save,
-  Upload
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ProjectDetails } from "@/components/project-details";
@@ -39,6 +30,7 @@ const NewProject = () => {
     voiceId: "Roger",
     backgroundMusic: "upbeat",
     musicVolume: 30,
+    script: "",
   });
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
