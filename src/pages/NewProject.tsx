@@ -1,30 +1,23 @@
+
 import React, { useState } from "react";
 import { Header } from "@/components/header";
-import { BlurCard } from "@/components/ui/blur-card";
-import { RevealAnimation } from "@/components/ui/reveal-animation";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  ArrowLeft, 
-  Wand2, 
-  Music, 
-  VideoIcon, 
-  Mic, 
-  FileText,
-} from "lucide-react";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
 import { ProjectDetails } from "@/components/project-details";
 import { VideoPreview } from "@/components/video-preview";
 import { AudioOptions } from "@/components/audio-options";
 import { useToast } from "@/hooks/use-toast";
-import { RunwayService } from "@/services/runway-service";
+import { ProjectHeader } from "@/components/project/project-header";
+import { ProjectStepsNav } from "@/components/project/project-steps-nav";
+import { useVideoGenerator, ProjectData } from "@/hooks/use-video-generator";
 
 const NewProject = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [step, setStep] = useState<"details" | "preview" | "audio">("details");
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [projectData, setProjectData] = useState({
+  const { isGenerating, videoUrl, generateVideo } = useVideoGenerator();
+  
+  const [projectData, setProjectData] = useState<ProjectData>({
     title: "",
     concept: "",
     duration: 60,
@@ -35,68 +28,19 @@ const NewProject = () => {
     script: "",
     runwayApiKey: "",
   });
-  const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
   const handleBackToDashboard = () => {
     navigate("/dashboard");
   };
 
-  const handleProjectDataChange = (data: Partial<typeof projectData>) => {
+  const handleProjectDataChange = (data: Partial<ProjectData>) => {
     setProjectData(prev => ({ ...prev, ...data }));
   };
 
   const handleGenerateVideo = async () => {
-    if (!projectData.runwayApiKey) {
-      toast({
-        title: "API Key Required",
-        description: "Please enter your Runway AI API key in the Project Details tab.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!projectData.script) {
-      toast({
-        title: "Script Required",
-        description: "Please generate or enter a script before generating a video.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsGenerating(true);
-    
-    try {
-      const prompt = `Create a ${projectData.duration}-second ${projectData.style} video about: ${projectData.concept}`;
-      
-      // Use the Runway AI service
-      const runwayService = new RunwayService(projectData.runwayApiKey);
-      const videoUrl = await runwayService.generateVideo({
-        apiKey: projectData.runwayApiKey,
-        prompt,
-        style: projectData.style,
-        script: projectData.script
-      });
-      
-      setVideoUrl(videoUrl);
+    const url = await generateVideo(projectData);
+    if (url) {
       setStep("preview");
-      
-      toast({
-        title: "Video Generated",
-        description: "Your AI video has been successfully generated.",
-      });
-    } catch (error) {
-      console.error("Video generation error:", error);
-      toast({
-        title: "Generation Failed",
-        description: "Failed to generate video. Please check your API key and try again.",
-        variant: "destructive"
-      });
-      
-      // For testing purposes, use a placeholder video URL
-      setVideoUrl("/placeholder.svg");
-    } finally {
-      setIsGenerating(false);
     }
   };
 
@@ -114,44 +58,15 @@ const NewProject = () => {
       <Header />
       <main className="flex-grow pt-24">
         <div className="section-container max-w-5xl mx-auto">
-          <div className="mb-6 flex items-center">
-            <Button 
-              variant="ghost" 
-              onClick={handleBackToDashboard}
-              className="mr-2"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
-            </Button>
-          </div>
+          <ProjectHeader onBackClick={handleBackToDashboard} />
 
-          <RevealAnimation>
-            <h1 className="text-3xl font-bold mb-6">
-              <span className="text-youtube-black dark:text-white">New </span>
-              <span className="text-youtube-red">Project</span>
-            </h1>
-          </RevealAnimation>
+          <ProjectStepsNav 
+            step={step} 
+            onStepChange={setStep} 
+            videoUrl={videoUrl} 
+          />
 
-          <Tabs 
-            value={step} 
-            onValueChange={(value) => setStep(value as typeof step)}
-            className="mb-8"
-          >
-            <TabsList className="grid w-full grid-cols-3 mb-8">
-              <TabsTrigger value="details">
-                <FileText className="w-4 h-4 mr-2" />
-                Project Details
-              </TabsTrigger>
-              <TabsTrigger value="preview" disabled={!videoUrl}>
-                <VideoIcon className="w-4 h-4 mr-2" />
-                Video Preview
-              </TabsTrigger>
-              <TabsTrigger value="audio" disabled={!videoUrl}>
-                <Music className="w-4 h-4 mr-2" />
-                Audio Options
-              </TabsTrigger>
-            </TabsList>
-
+          <Tabs value={step} className="mb-8">
             <TabsContent value="details">
               <ProjectDetails 
                 projectData={projectData}
