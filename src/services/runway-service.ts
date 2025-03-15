@@ -25,7 +25,8 @@ export class RunwayService {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${this.apiKey}`,
-          'API-Version': '2'
+          // Changed from 'API-Version' to 'Accept-Version' based on error logs
+          'Accept-Version': '2'
         },
         body: JSON.stringify({
           prompt: params.prompt,
@@ -38,7 +39,7 @@ export class RunwayService {
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Runway API error:", errorData);
-        throw new Error(errorData.message || "Failed to generate video");
+        throw new Error(errorData.message || errorData.error || "Failed to generate video");
       }
       
       const data = await response.json();
