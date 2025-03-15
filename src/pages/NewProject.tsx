@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Header } from "@/components/header";
 import { BlurCard } from "@/components/ui/blur-card";
@@ -18,8 +17,7 @@ import { ProjectDetails } from "@/components/project-details";
 import { VideoPreview } from "@/components/video-preview";
 import { AudioOptions } from "@/components/audio-options";
 import { useToast } from "@/hooks/use-toast";
-import { RunwareService } from "@/services/runware-service";
-import { RunwareWebSocketService } from "@/services/runware-websocket-service";
+import { RunwayService } from "@/services/runway-service";
 
 const NewProject = () => {
   const navigate = useNavigate();
@@ -51,7 +49,7 @@ const NewProject = () => {
     if (!projectData.runwayApiKey) {
       toast({
         title: "API Key Required",
-        description: "Please enter your Runware AI API key in the Project Details tab.",
+        description: "Please enter your Runway AI API key in the Project Details tab.",
         variant: "destructive"
       });
       return;
@@ -69,37 +67,18 @@ const NewProject = () => {
     setIsGenerating(true);
     
     try {
-      // First try using the WebSocket service
       const prompt = `Create a ${projectData.duration}-second ${projectData.style} video about: ${projectData.concept}`;
       
-      try {
-        // Try WebSocket API first
-        const wsService = new RunwareWebSocketService(projectData.runwayApiKey);
-        const result = await wsService.generateVideo({
-          prompt,
-          duration: projectData.duration,
-          style: projectData.style,
-          script: projectData.script
-        });
-        
-        setVideoUrl(result.videoURL);
-      } catch (wsError) {
-        console.error("WebSocket API failed, trying REST API:", wsError);
-        
-        // Fallback to REST API
-        const restService = new RunwareService(projectData.runwayApiKey);
-        const videoUrl = await restService.generateVideo({
-          apiKey: projectData.runwayApiKey,
-          prompt,
-          duration: projectData.duration,
-          style: projectData.style,
-          script: projectData.script
-        });
-        
-        setVideoUrl(videoUrl);
-      }
+      // Use the Runway AI service
+      const runwayService = new RunwayService(projectData.runwayApiKey);
+      const videoUrl = await runwayService.generateVideo({
+        apiKey: projectData.runwayApiKey,
+        prompt,
+        style: projectData.style,
+        script: projectData.script
+      });
       
-      // If we get here, one of the APIs worked
+      setVideoUrl(videoUrl);
       setStep("preview");
       
       toast({

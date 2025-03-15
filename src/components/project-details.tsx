@@ -123,17 +123,17 @@ export const ProjectDetails: React.FC<ProjectDetailsProps> = ({
         <div>
           <Label htmlFor="runwayApiKey" className="mb-2 block flex items-center">
             <Key className="w-4 h-4 mr-2 text-youtube-red" />
-            Runware AI API Key
+            Runway AI API Key
           </Label>
           <Input
             id="runwayApiKey"
             type="password"
-            placeholder="Enter your Runware AI API key"
+            placeholder="Enter your Runway AI API key"
             value={projectData.runwayApiKey || ""}
             onChange={(e) => onProjectDataChange({ runwayApiKey: e.target.value })}
           />
           <p className="text-xs text-muted-foreground mt-1">
-            Get your API key from <a href="https://runware.ai" target="_blank" rel="noopener noreferrer" className="text-youtube-red hover:underline">Runware AI</a>
+            Get your API key from <a href="https://runwayml.com" target="_blank" rel="noopener noreferrer" className="text-youtube-red hover:underline">Runway AI</a>
           </p>
         </div>
 
@@ -253,7 +253,7 @@ export const ProjectDetails: React.FC<ProjectDetailsProps> = ({
           {isGenerating ? (
             <>
               <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-              Generating Video with Runware AI...
+              Generating Video with Runway AI...
             </>
           ) : (
             <>
