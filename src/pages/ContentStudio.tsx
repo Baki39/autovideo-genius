@@ -101,60 +101,57 @@ const ContentStudio = () => {
             </p>
           </RevealAnimation>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+          <Tabs 
+            value={activeTab} 
+            onValueChange={setActiveTab}
+            className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8"
+          >
             <div className="lg:col-span-1">
               <BlurCard className="p-4 h-full">
-                <Tabs 
-                  value={activeTab} 
-                  onValueChange={setActiveTab}
-                  orientation="vertical" 
-                  className="h-full"
-                >
-                  <TabsList className="flex flex-col items-stretch h-auto w-full space-y-1 bg-transparent">
-                    <TabsTrigger 
-                      value="research" 
-                      className="justify-start text-left w-full px-3 py-3"
-                    >
-                      <Brain className="w-4 h-4 mr-2 text-blue-600 dark:text-blue-400" />
-                      Research & Trends
-                    </TabsTrigger>
-                    <TabsTrigger 
-                      value="planning" 
-                      className="justify-start text-left w-full px-3 py-3"
-                    >
-                      <Calendar className="w-4 h-4 mr-2 text-indigo-600 dark:text-indigo-400" />
-                      Content Planning
-                    </TabsTrigger>
-                    <TabsTrigger 
-                      value="scripting" 
-                      className="justify-start text-left w-full px-3 py-3"
-                    >
-                      <FileText className="w-4 h-4 mr-2 text-purple-600 dark:text-purple-400" />
-                      Script & Storyboard
-                    </TabsTrigger>
-                    <TabsTrigger 
-                      value="production" 
-                      className="justify-start text-left w-full px-3 py-3"
-                    >
-                      <VideoIcon className="w-4 h-4 mr-2 text-rose-600 dark:text-rose-400" />
-                      Video Production
-                    </TabsTrigger>
-                    <TabsTrigger 
-                      value="optimization" 
-                      className="justify-start text-left w-full px-3 py-3"
-                    >
-                      <Tags className="w-4 h-4 mr-2 text-amber-600 dark:text-amber-400" />
-                      SEO & Metadata
-                    </TabsTrigger>
-                    <TabsTrigger 
-                      value="analytics" 
-                      className="justify-start text-left w-full px-3 py-3"
-                    >
-                      <BarChart3 className="w-4 h-4 mr-2 text-emerald-600 dark:text-emerald-400" />
-                      Performance Analytics
-                    </TabsTrigger>
-                  </TabsList>
-                </Tabs>
+                <TabsList className="flex flex-col items-stretch h-auto w-full space-y-1 bg-transparent">
+                  <TabsTrigger 
+                    value="research" 
+                    className="justify-start text-left w-full px-3 py-3"
+                  >
+                    <Brain className="w-4 h-4 mr-2 text-blue-600 dark:text-blue-400" />
+                    Research & Trends
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="planning" 
+                    className="justify-start text-left w-full px-3 py-3"
+                  >
+                    <Calendar className="w-4 h-4 mr-2 text-indigo-600 dark:text-indigo-400" />
+                    Content Planning
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="scripting" 
+                    className="justify-start text-left w-full px-3 py-3"
+                  >
+                    <FileText className="w-4 h-4 mr-2 text-purple-600 dark:text-purple-400" />
+                    Script & Storyboard
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="production" 
+                    className="justify-start text-left w-full px-3 py-3"
+                  >
+                    <VideoIcon className="w-4 h-4 mr-2 text-rose-600 dark:text-rose-400" />
+                    Video Production
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="optimization" 
+                    className="justify-start text-left w-full px-3 py-3"
+                  >
+                    <Tags className="w-4 h-4 mr-2 text-amber-600 dark:text-amber-400" />
+                    SEO & Metadata
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="analytics" 
+                    className="justify-start text-left w-full px-3 py-3"
+                  >
+                    <BarChart3 className="w-4 h-4 mr-2 text-emerald-600 dark:text-emerald-400" />
+                    Performance Analytics
+                  </TabsTrigger>
+                </TabsList>
               </BlurCard>
             </div>
 
@@ -455,7 +452,7 @@ const ContentStudio = () => {
                 </BlurCard>
               </TabsContent>
             </div>
-          </div>
+          </Tabs>
         </div>
       </main>
     </div>
