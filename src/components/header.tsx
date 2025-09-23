@@ -64,18 +64,36 @@ export const Header = () => {
             >
               Dashboard
             </Link>
-            <a
-              href="#features"
-              className="text-sm font-medium text-youtube-black hover:text-foreground dark:text-white/80 dark:hover:text-white transition-colors"
+            <Link
+              to="/content-studio"
+              className={`text-sm font-medium ${
+                location.pathname === "/content-studio" 
+                  ? "text-youtube-red" 
+                  : "text-youtube-black hover:text-foreground dark:text-white/80 dark:hover:text-white"
+              } transition-colors`}
             >
-              Features
-            </a>
-            <a
-              href="#pricing"
-              className="text-sm font-medium text-youtube-black hover:text-foreground dark:text-white/80 dark:hover:text-white transition-colors"
+              Studio
+            </Link>
+            <Link
+              to="/analytics"
+              className={`text-sm font-medium ${
+                location.pathname === "/analytics" 
+                  ? "text-youtube-red" 
+                  : "text-youtube-black hover:text-foreground dark:text-white/80 dark:hover:text-white"
+              } transition-colors`}
             >
-              Pricing
-            </a>
+              Analytics
+            </Link>
+            <Link
+              to="/content-calendar"
+              className={`text-sm font-medium ${
+                location.pathname === "/content-calendar" 
+                  ? "text-youtube-red" 
+                  : "text-youtube-black hover:text-foreground dark:text-white/80 dark:hover:text-white"
+              } transition-colors`}
+            >
+              Calendar
+            </Link>
             <Button variant="outline" size="sm" asChild>
               <Link to="/dashboard">Sign In</Link>
             </Button>
@@ -128,20 +146,39 @@ export const Header = () => {
             >
               Dashboard
             </Link>
-            <a
-              href="#features"
-              className="text-sm font-medium text-youtube-black hover:text-foreground dark:text-white/80 dark:hover:text-white transition-colors"
+            <Link
+              to="/content-studio"
+              className={`text-sm font-medium ${
+                location.pathname === "/content-studio" 
+                  ? "text-youtube-red" 
+                  : "text-youtube-black hover:text-foreground dark:text-white/80 dark:hover:text-white"
+              } transition-colors`}
               onClick={() => setMobileMenuOpen(false)}
             >
-              Features
-            </a>
-            <a
-              href="#pricing"
-              className="text-sm font-medium text-youtube-black hover:text-foreground dark:text-white/80 dark:hover:text-white transition-colors"
+              Studio
+            </Link>
+            <Link
+              to="/analytics"
+              className={`text-sm font-medium ${
+                location.pathname === "/analytics" 
+                  ? "text-youtube-red" 
+                  : "text-youtube-black hover:text-foreground dark:text-white/80 dark:hover:text-white"
+              } transition-colors`}
               onClick={() => setMobileMenuOpen(false)}
             >
-              Pricing
-            </a>
+              Analytics
+            </Link>
+            <Link
+              to="/content-calendar"
+              className={`text-sm font-medium ${
+                location.pathname === "/content-calendar" 
+                  ? "text-youtube-red" 
+                  : "text-youtube-black hover:text-foreground dark:text-white/80 dark:hover:text-white"
+              } transition-colors`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Calendar
+            </Link>
             <div className="pt-2 flex flex-col space-y-3">
               <Button variant="outline" size="sm" className="w-full" asChild>
                 <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
