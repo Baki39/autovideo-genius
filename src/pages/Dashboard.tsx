@@ -5,6 +5,7 @@ import { RevealAnimation } from "@/components/ui/reveal-animation";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { YouTubeConnect } from "@/components/youtube-connect";
+import { AIAgentSetup } from "@/components/ai-agent-setup";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Youtube, 
@@ -352,8 +353,18 @@ const Dashboard = () => {
             </RevealAnimation>
           </div>
 
+          <div className="grid grid-cols-1 gap-6 mb-8">
+            <RevealAnimation delay={500}>
+              <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+                <BlurCard className="p-6">
+                  <AIAgentSetup />
+                </BlurCard>
+              </div>
+            </RevealAnimation>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <RevealAnimation delay={500} className="lg:col-span-2">
+            <RevealAnimation delay={600} className="lg:col-span-2">
               <BlurCard className="p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="font-semibold text-lg">
@@ -459,7 +470,7 @@ const Dashboard = () => {
               </BlurCard>
             </RevealAnimation>
 
-            <RevealAnimation delay={600}>
+            <RevealAnimation delay={700}>
               <BlurCard className="p-6 h-full">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="font-semibold text-lg">
