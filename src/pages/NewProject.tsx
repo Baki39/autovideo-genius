@@ -26,7 +26,7 @@ const NewProject = () => {
     backgroundMusic: "upbeat",
     musicVolume: 30,
     script: "",
-    runwayApiKey: "",
+    heilouApiKey: "",
   });
 
   const handleBackToDashboard = () => {

@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { RunwayService } from "@/services/runway-service";
+import { HeilouService } from "@/services/heilou-service";
 import { useToast } from "@/hooks/use-toast";
 
 export interface ProjectData {
@@ -12,7 +12,7 @@ export interface ProjectData {
   backgroundMusic: string;
   musicVolume: number;
   script: string;
-  runwayApiKey: string;
+  heilouApiKey: string;
 }
 
 export const useVideoGenerator = () => {
@@ -21,10 +21,10 @@ export const useVideoGenerator = () => {
   const { toast } = useToast();
 
   const generateVideo = async (projectData: ProjectData) => {
-    if (!projectData.runwayApiKey) {
+    if (!projectData.heilouApiKey) {
       toast({
         title: "API Key Required",
-        description: "Please enter your Runway AI API key in the Project Details tab.",
+        description: "Please enter your Heilou AI API key in the Project Details tab.",
         variant: "destructive"
       });
       return;
@@ -44,10 +44,10 @@ export const useVideoGenerator = () => {
     try {
       const prompt = `Create a ${projectData.duration}-second ${projectData.style} video about: ${projectData.concept}`;
       
-      // Use the Runway AI service
-      const runwayService = new RunwayService(projectData.runwayApiKey);
-      const generatedVideoUrl = await runwayService.generateVideo({
-        apiKey: projectData.runwayApiKey,
+      // Use the Heilou AI service
+      const heilouService = new HeilouService(projectData.heilouApiKey);
+      const generatedVideoUrl = await heilouService.generateVideo({
+        apiKey: projectData.heilouApiKey,
         prompt,
         style: projectData.style,
         script: projectData.script
