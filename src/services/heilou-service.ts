@@ -17,7 +17,7 @@ export class HeilouService {
   
   async generateVideo(params: GenerateVideoParams): Promise<string> {
     try {
-      console.log("Generating video with Heilou AI using prompt:", params.prompt);
+      console.log("Generating video with AIML API using prompt:", params.prompt);
       
       // Step 1: Create generation task
       const generationResponse = await fetch(`${API_BASE_URL}/generate/video/minimax/generation`, {
@@ -34,12 +34,12 @@ export class HeilouService {
       
       if (!generationResponse.ok) {
         const errorData = await generationResponse.json();
-        console.error("Heilou API generation error:", errorData);
+        console.error("AIML API generation error:", errorData);
         throw new Error(errorData.message || errorData.error || "Failed to start video generation");
       }
       
       const generationData = await generationResponse.json();
-      console.log("Heilou generation response:", generationData);
+      console.log("AIML generation response:", generationData);
       
       const generationId = generationData.generation_id;
       if (!generationId) {
@@ -51,7 +51,7 @@ export class HeilouService {
       return await this.pollForResults(generationId);
       
     } catch (error) {
-      console.error("Error generating video with Heilou AI:", error);
+      console.error("Error generating video with AIML API:", error);
       throw error;
     }
   }

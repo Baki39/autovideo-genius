@@ -24,7 +24,7 @@ export const useVideoGenerator = () => {
     if (!projectData.heilouApiKey) {
       toast({
         title: "API Key Required",
-        description: "Please enter your Heilou AI API key in the Project Details tab.",
+        description: "Please enter your AIML API key in the Project Details tab.",
         variant: "destructive"
       });
       return;
