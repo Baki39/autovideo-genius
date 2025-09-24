@@ -1,4 +1,4 @@
-const API_ENDPOINT = "https://api.heilou.ai/v1/generate";
+const API_BASE_URL = "https://api.aimlapi.com/v2";
 
 export interface GenerateVideoParams {
   prompt: string;
@@ -19,39 +19,81 @@ export class HeilouService {
     try {
       console.log("Generating video with Heilou AI using prompt:", params.prompt);
       
-      const response = await fetch(API_ENDPOINT, {
+      // Step 1: Create generation task
+      const generationResponse = await fetch(`${API_BASE_URL}/generate/video/minimax/generation`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Accept-Version': '1'
+          'Authorization': `Bearer ${this.apiKey}`
         },
         body: JSON.stringify({
-          prompt: params.prompt,
-          model: params.model || "heilou-video-v1",
-          style: params.style || "educational",
-          script: params.script
+          model: "minimax/hailuo-02",
+          prompt: params.prompt
         })
       });
       
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Heilou API error:", errorData);
-        throw new Error(errorData.message || errorData.error || "Failed to generate video");
+      if (!generationResponse.ok) {
+        const errorData = await generationResponse.json();
+        console.error("Heilou API generation error:", errorData);
+        throw new Error(errorData.message || errorData.error || "Failed to start video generation");
       }
       
-      const data = await response.json();
-      console.log("Heilou API response:", data);
+      const generationData = await generationResponse.json();
+      console.log("Heilou generation response:", generationData);
       
-      // Extract video URL from response (adjust based on Heilou API response structure)
-      if (!data.output || !data.output.video_url) {
-        throw new Error("No video URL in response");
+      const generationId = generationData.generation_id;
+      if (!generationId) {
+        throw new Error("No generation ID received");
       }
       
-      return data.output.video_url;
+      // Step 2: Poll for results
+      console.log("Polling for video generation results...");
+      return await this.pollForResults(generationId);
+      
     } catch (error) {
       console.error("Error generating video with Heilou AI:", error);
       throw error;
     }
+  }
+
+  private async pollForResults(generationId: string): Promise<string> {
+    const maxAttempts = 60; // Max 10 minutes (60 * 10 seconds)
+    let attempts = 0;
+    
+    while (attempts < maxAttempts) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/generate/video/minimax/generation?generation_id=${generationId}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${this.apiKey}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log(`Poll attempt ${attempts + 1}:`, data);
+        
+        if (data.status === 'completed' && data.video_url) {
+          console.log("Video generation completed!");
+          return data.video_url;
+        } else if (data.status === 'failed') {
+          throw new Error(data.error || "Video generation failed");
+        }
+        
+        // Wait 10 seconds before next poll
+        await new Promise(resolve => setTimeout(resolve, 10000));
+        attempts++;
+        
+      } catch (error) {
+        console.error("Error polling for results:", error);
+        throw error;
+      }
+    }
+    
+    throw new Error("Video generation timed out");
   }
 }
