@@ -21,7 +21,9 @@ export const useVideoGenerator = () => {
   const { toast } = useToast();
 
   const generateVideo = async (projectData: ProjectData) => {
+    console.log("🎬 Starting video generation with data:", projectData);
     if (!projectData.minimaxApiKey) {
+      console.log("❌ No MiniMax API key provided");
       toast({
         title: "API Key Required",
         description: "Please enter your MiniMax API key in the Project Details tab.",
@@ -31,6 +33,7 @@ export const useVideoGenerator = () => {
     }
 
     if (!projectData.script) {
+      console.log("❌ No script provided");
       toast({
         title: "Script Required",
         description: "Please generate or enter a script before generating a video.",
@@ -40,18 +43,22 @@ export const useVideoGenerator = () => {
     }
 
     setIsGenerating(true);
+    console.log("🚀 Starting video generation process");
     
     try {
       const prompt = `Create a ${projectData.duration}-second ${projectData.style} video about: ${projectData.concept}`;
+      console.log("📝 Generated prompt:", prompt);
       
       // Use the MiniMax AI service
       const minimaxService = new MinimaxService(projectData.minimaxApiKey);
+      console.log("🔧 MiniMax service initialized");
       const generatedVideoUrl = await minimaxService.generateVideo({
         apiKey: projectData.minimaxApiKey,
         prompt,
         style: projectData.style,
         script: projectData.script
       });
+      console.log("✅ Video generation completed, URL:", generatedVideoUrl);
       
       setVideoUrl(generatedVideoUrl);
       
@@ -62,7 +69,8 @@ export const useVideoGenerator = () => {
       
       return generatedVideoUrl;
     } catch (error) {
-      console.error("Video generation error:", error);
+      console.error("❌ Video generation error:", error);
+      console.log("Error details:", error);
       toast({
         title: "Generation Failed",
         description: "Failed to generate video. Please check your API key and try again.",
@@ -73,6 +81,7 @@ export const useVideoGenerator = () => {
       setVideoUrl("/placeholder.svg");
       return "/placeholder.svg";
     } finally {
+      console.log("🏁 Video generation process finished");
       setIsGenerating(false);
     }
   };

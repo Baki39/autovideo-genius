@@ -43,9 +43,11 @@ export class MinimaxService {
   
   async generateVideo(params: GenerateVideoParams): Promise<string> {
     try {
-      console.log("Generating video with MiniMax API using prompt:", params.prompt);
+      console.log("🌐 MiniMax API: Generating video with prompt:", params.prompt);
+      console.log("🔑 Using API key:", params.apiKey ? `${params.apiKey.substring(0, 8)}...` : 'MISSING');
       
       // Step 1: Create video generation task
+      console.log("📡 Making request to MiniMax API...");
       const generationResponse = await fetch(`${API_BASE_URL}/videos/create`, {
         method: 'POST',
         headers: {
@@ -59,14 +61,17 @@ export class MinimaxService {
         })
       });
       
+      console.log("📈 Response status:", generationResponse.status);
+      console.log("📊 Response headers:", Object.fromEntries(generationResponse.headers.entries()));
+      
       if (!generationResponse.ok) {
         const errorData = await generationResponse.json();
-        console.error("MiniMax API generation error:", errorData);
+        console.error("❌ MiniMax API generation error:", errorData);
         throw new Error(errorData.error || "Failed to start video generation");
       }
       
       const generationData: VideoResponse = await generationResponse.json();
-      console.log("MiniMax generation response:", generationData);
+      console.log("📋 MiniMax generation response:", generationData);
       
       const videoId = generationData.videoId;
       if (!videoId) {
