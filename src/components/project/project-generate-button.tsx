@@ -23,7 +23,7 @@ export const ProjectGenerateButton: React.FC<ProjectGenerateButtonProps> = ({
       {isGenerating ? (
         <>
           <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-          Generating Video with Runway AI...
+          Generating Video with HailoAI...
         </>
       ) : (
         <>
