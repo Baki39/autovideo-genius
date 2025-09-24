@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://api.useapi.net/v1/minimax";
+const API_BASE_URL = "https://api.aimlapi.com/v2";
 
 export interface GenerateVideoParams {
   prompt: string;
@@ -43,58 +43,55 @@ export class MinimaxService {
   
   async generateVideo(params: GenerateVideoParams): Promise<string> {
     try {
-      console.log("🌐 MiniMax API: Generating video with prompt:", params.prompt);
+      console.log("🌐 AIML API (MiniMax): Generating video with prompt:", params.prompt);
       console.log("🔑 Using API key:", params.apiKey ? `${params.apiKey.substring(0, 8)}...` : 'MISSING');
       
-      // Step 1: Create video generation task
-      console.log("📡 Making request to MiniMax API...");
-      const generationResponse = await fetch(`${API_BASE_URL}/videos/create`, {
+      // Step 1: Create generation task (AIML API)
+      console.log("📡 Creating generation task on AIML API...");
+      const generationResponse = await fetch(`${API_BASE_URL}/generate/video/minimax/generation`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${this.apiKey}`
         },
         body: JSON.stringify({
-          prompt: params.prompt,
-          model: params.model || "T2V-01",
-          promptOptimization: true
+          model: params.model || "minimax/hailuo-02",
+          prompt: params.prompt
         })
       });
       
       console.log("📈 Response status:", generationResponse.status);
-      console.log("📊 Response headers:", Object.fromEntries(generationResponse.headers.entries()));
-      
       if (!generationResponse.ok) {
-        const errorData = await generationResponse.json();
-        console.error("❌ MiniMax API generation error:", errorData);
-        throw new Error(errorData.error || "Failed to start video generation");
+        const errorData = await generationResponse.json().catch(() => ({}));
+        console.error("❌ AIML API generation error:", errorData);
+        throw new Error((errorData as any).message || (errorData as any).error || "Failed to start video generation");
       }
       
-      const generationData: VideoResponse = await generationResponse.json();
-      console.log("📋 MiniMax generation response:", generationData);
+      const generationData: any = await generationResponse.json();
+      console.log("📋 AIML generation response:", generationData);
       
-      const videoId = generationData.videoId;
-      if (!videoId) {
-        throw new Error("No video ID received");
+      const generationId = generationData.generation_id;
+      if (!generationId) {
+        throw new Error("No generation ID received");
       }
       
       // Step 2: Poll for results
-      console.log("Polling for video generation results...");
-      return await this.pollForResults(videoId);
+      console.log("⏳ Polling for video generation results...");
+      return await this.pollForResults(generationId);
       
     } catch (error) {
-      console.error("Error generating video with MiniMax API:", error);
+      console.error("Error generating video with AIML API (MiniMax):", error);
       throw error;
     }
   }
 
-  private async pollForResults(videoId: string): Promise<string> {
+  private async pollForResults(generationId: string): Promise<string> {
     const maxAttempts = 60; // Max 10 minutes (60 * 10 seconds)
     let attempts = 0;
     
     while (attempts < maxAttempts) {
       try {
-        const response = await fetch(`${API_BASE_URL}/videos/${videoId}`, {
+        const response = await fetch(`${API_BASE_URL}/generate/video/minimax/generation?generation_id=${generationId}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${this.apiKey}`,
@@ -103,20 +100,18 @@ export class MinimaxService {
         });
         
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error((errorData as any).error || (errorData as any).message || `HTTP ${response.status}: ${response.statusText}`);
         }
         
-        const data: VideoStatus = await response.json();
+        const data: any = await response.json();
         console.log(`Poll attempt ${attempts + 1}:`, data);
         
-        // Status 2 means completed
-        if (data.status === 2 && data.statusFinal && data.videoURL) {
+        if (data.status === 'completed' && data.video_url) {
           console.log("Video generation completed!");
-          // Use downloadURL if available (for paid accounts without watermark), otherwise use videoURL
-          return data.downloadURL || data.videoURL;
-        } else if (data.statusLabel.toLowerCase().includes('failed') || data.statusLabel.toLowerCase().includes('error')) {
-          throw new Error(`Video generation failed: ${data.statusLabel}`);
+          return data.video_url;
+        } else if (data.status === 'failed') {
+          throw new Error(data.error || "Video generation failed");
         }
         
         // Wait 10 seconds before next poll

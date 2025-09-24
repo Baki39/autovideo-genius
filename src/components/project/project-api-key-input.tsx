@@ -27,7 +27,7 @@ export const ProjectApiKeyInput: React.FC<ProjectApiKeyInputProps> = ({
         onChange={(e) => onApiKeyChange(e.target.value)}
       />
       <p className="text-xs text-muted-foreground mt-1">
-        Get your API key from <a href="https://useapi.net/docs/start-here/setup-useapi" target="_blank" rel="noopener noreferrer" className="text-youtube-red hover:underline">UseAPI.net</a>
+        Get your API key from <a href="https://aimlapi.com/app/keys" target="_blank" rel="noopener noreferrer" className="text-youtube-red hover:underline">AIML API</a>
       </p>
     </div>
   );
