@@ -14,7 +14,7 @@ interface ProjectDetailsProps {
     duration: number;
     style: string;
     script?: string;
-    heilouApiKey?: string;
+    minimaxApiKey?: string;
   };
   onProjectDataChange: (data: Partial<{ 
     title: string;
@@ -22,7 +22,7 @@ interface ProjectDetailsProps {
     duration: number;
     style: string;
     script?: string;
-    heilouApiKey?: string;
+    minimaxApiKey?: string;
   }>) => void;
   onGenerate: () => void;
   isGenerating: boolean;
@@ -43,8 +43,8 @@ export const ProjectDetails: React.FC<ProjectDetailsProps> = ({
         />
 
         <ProjectApiKeyInput 
-          apiKey={projectData.heilouApiKey} 
-          onApiKeyChange={(heilouApiKey) => onProjectDataChange({ heilouApiKey })} 
+          apiKey={projectData.minimaxApiKey} 
+          onApiKeyChange={(minimaxApiKey) => onProjectDataChange({ minimaxApiKey })} 
         />
 
         <ProjectScriptSection 
@@ -74,7 +74,7 @@ export const ProjectDetails: React.FC<ProjectDetailsProps> = ({
         <ProjectGenerateButton 
           onGenerate={onGenerate}
           isGenerating={isGenerating}
-          isDisabled={!projectData.concept || !projectData.title || !projectData.heilouApiKey || !projectData.script}
+          isDisabled={!projectData.concept || !projectData.title || !projectData.minimaxApiKey || !projectData.script}
         />
       </div>
     </BlurCard>

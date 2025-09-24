@@ -15,19 +15,19 @@ export const ProjectApiKeyInput: React.FC<ProjectApiKeyInputProps> = ({
 }) => {
   return (
     <div>
-      <Label htmlFor="aimlApiKey" className="mb-2 block flex items-center">
+      <Label htmlFor="minimaxApiKey" className="mb-2 block flex items-center">
         <Key className="w-4 h-4 mr-2 text-youtube-red" />
-        AIML API Key
+        MiniMax API Key
       </Label>
       <Input
-        id="aimlApiKey"
+        id="minimaxApiKey"
         type="password"
-        placeholder="Enter your AIML API key"
+        placeholder="Enter your MiniMax API key"
         value={apiKey || ""}
         onChange={(e) => onApiKeyChange(e.target.value)}
       />
       <p className="text-xs text-muted-foreground mt-1">
-        Get your API key from <a href="https://aimlapi.com/app/keys" target="_blank" rel="noopener noreferrer" className="text-youtube-red hover:underline">AIML API</a>
+        Get your API key from <a href="https://useapi.net/docs/start-here/setup-useapi" target="_blank" rel="noopener noreferrer" className="text-youtube-red hover:underline">UseAPI.net</a>
       </p>
     </div>
   );

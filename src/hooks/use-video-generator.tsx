@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { HeilouService } from "@/services/heilou-service";
+import { MinimaxService } from "@/services/minimax-service";
 import { useToast } from "@/hooks/use-toast";
 
 export interface ProjectData {
@@ -12,7 +12,7 @@ export interface ProjectData {
   backgroundMusic: string;
   musicVolume: number;
   script: string;
-  heilouApiKey: string;
+  minimaxApiKey: string;
 }
 
 export const useVideoGenerator = () => {
@@ -21,10 +21,10 @@ export const useVideoGenerator = () => {
   const { toast } = useToast();
 
   const generateVideo = async (projectData: ProjectData) => {
-    if (!projectData.heilouApiKey) {
+    if (!projectData.minimaxApiKey) {
       toast({
         title: "API Key Required",
-        description: "Please enter your AIML API key in the Project Details tab.",
+        description: "Please enter your MiniMax API key in the Project Details tab.",
         variant: "destructive"
       });
       return;
@@ -44,10 +44,10 @@ export const useVideoGenerator = () => {
     try {
       const prompt = `Create a ${projectData.duration}-second ${projectData.style} video about: ${projectData.concept}`;
       
-      // Use the Heilou AI service
-      const heilouService = new HeilouService(projectData.heilouApiKey);
-      const generatedVideoUrl = await heilouService.generateVideo({
-        apiKey: projectData.heilouApiKey,
+      // Use the MiniMax AI service
+      const minimaxService = new MinimaxService(projectData.minimaxApiKey);
+      const generatedVideoUrl = await minimaxService.generateVideo({
+        apiKey: projectData.minimaxApiKey,
         prompt,
         style: projectData.style,
         script: projectData.script
